@@ -1,0 +1,4 @@
+Active migrations target MySQL 8.4. Run python -m alembic upgrade head.
+The mysql_0001 baseline requires an empty target and does not seed records.
+Use scripts.transfer_postgres for existing data, or scripts.seed for new installs.
+Original PostgreSQL history is archived under archive/postgresql/versions.

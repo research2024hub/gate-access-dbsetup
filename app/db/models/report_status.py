@@ -1,0 +1,14 @@
+from app.db.types import UTCDateTime
+from sqlalchemy import Column, Integer, Boolean, String, DateTime, ForeignKey, func, text
+
+from app.db.database import Base
+
+class ReportStatus(Base):
+    __tablename__ = "report_status"
+
+    id = Column(Integer, primary_key=True)
+    report_id = Column(Integer, ForeignKey("user_reports.id", ondelete="CASCADE"), nullable=False, unique=True)
+    status = Column(String(50), nullable=False)
+    date_created = Column(UTCDateTime(), server_default=text("CURRENT_TIMESTAMP(6)"), default=func.current_timestamp(6), nullable=False)
+    date_updated = Column(UTCDateTime(), server_default=text("CURRENT_TIMESTAMP(6)"), default=func.current_timestamp(6), onupdate=func.current_timestamp(6), nullable=False)
+    

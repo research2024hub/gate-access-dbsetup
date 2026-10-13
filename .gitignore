@@ -1,0 +1,21 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Alembic cache
+alembic/versions/__pycache__/
+
+# Editor/OS
+.DS_Store
+
+# Local history and private data mappings
+.aider*
+.repomap.cache*/
+guest-owner-map.json

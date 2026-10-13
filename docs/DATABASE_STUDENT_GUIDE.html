@@ -1,0 +1,4031 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Gate Access database: a student’s guide</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+  :root{color-scheme:light;--ink:#17283c;--muted:#53647a;--line:#d9e2ed;--accent:#006c79;--paper:#fff;--code:#edf3f7}
+  html{scroll-behavior:smooth}body{margin:0 auto;max-width:1050px;padding:48px 42px 100px;font:17px/1.65 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:var(--paper)}
+  h1{font-size:2.6rem;line-height:1.13;letter-spacing:-.04em;max-width:850px}h2{margin-top:3.4rem;padding-top:1.4rem;border-top:2px solid var(--line);font-size:1.8rem;line-height:1.3}h3{margin-top:2.2rem;font-size:1.28rem;line-height:1.4}a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}strong{font-weight:650}
+  #TOC{background:#f2f7fa;border:1px solid var(--line);border-radius:12px;padding:20px 30px;margin:32px 0}#TOC ul{margin:.25em 0;padding-left:1.3em}#TOC>ul>li{margin-bottom:.4em}#TOC a{text-decoration:none}#TOC a:hover{text-decoration:underline}
+  table{border-collapse:collapse;width:100%;font-size:.87rem;line-height:1.5;margin:1.2em 0;display:block;overflow-x:auto}th,td{padding:10px 12px;border:1px solid var(--line);vertical-align:top;min-width:80px}th{background:#e9f2f4;text-align:left}tr:nth-child(even){background:#f8fafc}td:last-child{min-width:230px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88em;background:var(--code);border-radius:3px;padding:1px 4px;overflow-wrap:anywhere}pre{padding:18px 20px;background:#eff4f8;border:1px solid var(--line);border-radius:8px;overflow:auto;line-height:1.5}pre code{padding:0;background:none;overflow-wrap:normal}li{margin:.3em 0}figure{margin:2rem 0}figure svg{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#f8fbfc}figcaption{color:var(--muted);font-size:.9rem;margin-top:8px}.title{display:none}.sourceCode span{color:inherit!important}blockquote{border-left:4px solid var(--accent);padding-left:20px;color:var(--muted)}
+  @media(max-width:650px){body{padding:24px 16px;font-size:16px}h1{font-size:2rem}h2{font-size:1.5rem}th,td{padding:8px}}
+  @media print{body{max-width:none;padding:0;font-size:10pt;line-height:1.4}h1{font-size:25pt}h2{font-size:17pt;break-before:page}h3{font-size:13pt}h1,h2,h3{break-after:avoid}table{display:table;font-size:8pt;overflow:visible}th,td{min-width:0!important;padding:5px;overflow-wrap:anywhere}tr{break-inside:avoid}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8pt}#TOC{font-size:9pt}a{color:inherit}figure{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gate Access database: a student’s guide</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#gate-access-database-a-students-guide"
+id="toc-gate-access-database-a-students-guide">Gate Access database: a
+student’s guide</a>
+<ul>
+<li><a href="#how-to-use-this-guide" id="toc-how-to-use-this-guide">How
+to use this guide</a></li>
+<li><a href="#the-problem-the-database-solves"
+id="toc-the-problem-the-database-solves">1. The problem the database
+solves</a></li>
+<li><a href="#database-vocabulary-with-examples"
+id="toc-database-vocabulary-with-examples">2. Database vocabulary, with
+examples</a></li>
+<li><a href="#the-three-identities-to-understand-first"
+id="toc-the-three-identities-to-understand-first">3. The three
+identities to understand first</a></li>
+<li><a href="#table-directory-and-detailed-reference"
+id="toc-table-directory-and-detailed-reference">4. Table directory and
+detailed reference</a></li>
+<li><a href="#how-the-tables-work-together"
+id="toc-how-the-tables-work-together">5. How the tables work
+together</a></li>
+<li><a href="#triggers-automatic-database-rules"
+id="toc-triggers-automatic-database-rules">6. Triggers: automatic
+database rules</a></li>
+<li><a href="#unique-null-and-soft-deletion"
+id="toc-unique-null-and-soft-deletion">7. UNIQUE, NULL, and soft
+deletion</a></li>
+<li><a href="#deletion-and-historical-records"
+id="toc-deletion-and-historical-records">8. Deletion and historical
+records</a></li>
+<li><a href="#storage-types-indexes-and-validation-boundaries"
+id="toc-storage-types-indexes-and-validation-boundaries">9. Storage
+types, indexes, and validation boundaries</a></li>
+<li><a href="#why-the-postgresql-to-mysql-migration-was-done-this-way"
+id="toc-why-the-postgresql-to-mysql-migration-was-done-this-way">10. Why
+the PostgreSQL-to-MySQL migration was done this way</a></li>
+<li><a href="#ec2-lambda-and-certificates-in-plain-language"
+id="toc-ec2-lambda-and-certificates-in-plain-language">11. EC2, Lambda,
+and certificates in plain language</a></li>
+<li><a href="#read-only-sql-exercises"
+id="toc-read-only-sql-exercises">12. Read-only SQL exercises</a></li>
+<li><a href="#validation-evidence-and-remaining-limits"
+id="toc-validation-evidence-and-remaining-limits">13. Validation
+evidence and remaining limits</a></li>
+<li><a href="#source-map-for-further-study"
+id="toc-source-map-for-further-study">14. Source map for further
+study</a></li>
+<li><a href="#questions-to-check-your-understanding"
+id="toc-questions-to-check-your-understanding">15. Questions to check
+your understanding</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="gate-access-database-a-students-guide">Gate Access database: a
+student’s guide</h1>
+<p><strong>Edition:</strong> 2 October 2026 · <strong>Database:</strong>
+MySQL 8.4 · <strong>Schema revision:</strong>
+<code>mysql_0003</code></p>
+<p>This guide explains the database that supports the Gate Access
+application: what every table stores, how the tables work together,
+which rules MySQL enforces, and why the PostgreSQL-to-MySQL conversion
+took its current form.</p>
+<p>It describes the current repository models and migrations, with
+selected API code checked for context. It is not a claim that every API
+endpoint has been tested or deployed. The examples use fictional people
+and IDs, not production records. No passwords, private keys, or actual
+user contact details are included.</p>
+<p>Some choices were inherited from the original application. Where we
+explain a useful design rationale, that is an explanation of the
+design’s benefit, not a claim that an original author documented that
+exact intention. Migration-specific decisions and the trigger repair are
+explained separately.</p>
+<h2 id="how-to-use-this-guide">How to use this guide</h2>
+<p>Read sections 1–3 first. Then use the table directory to look up a
+particular table. Sections 5–9 explain the rules that connect the
+tables. The final sections provide read-only SQL exercises, operational
+context, and links to the implementation.</p>
+<h2 id="the-problem-the-database-solves">1. The problem the database
+solves</h2>
+<p>Imagine an estate called Cedar Court. A resident has a login, a
+membership in Cedar Court, a vehicle, and permission to pass through
+certain gates. The resident can invite a guest, register that guest for
+an event, and report an issue. Gate controllers send heartbeats and
+device measurements. The system records access activity and
+administrative actions.</p>
+<p>A single enormous table would repeat the resident’s login details for
+every vehicle, guest, and event. Updating one piece of information would
+require many edits. This database instead separates concepts and links
+them with IDs. That organization is called
+<strong>normalization</strong>: keep each kind of fact in its
+appropriate place and use relationships to connect facts.</p>
+<h2 id="database-vocabulary-with-examples">2. Database vocabulary, with
+examples</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in this project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Table</td>
+<td>A collection of one kind of record, such as
+<code>vehicles</code>.</td>
+</tr>
+<tr>
+<td>Row</td>
+<td>One record, such as one vehicle.</td>
+</tr>
+<tr>
+<td>Column</td>
+<td>One property, such as <code>license_plate_number</code>.</td>
+</tr>
+<tr>
+<td>Primary key (PK)</td>
+<td>The value, or combination of values, that uniquely identifies a
+row.</td>
+</tr>
+<tr>
+<td>Foreign key (FK)</td>
+<td>A reference to a real row in another table, such as a vehicle’s
+<code>personal_info_id</code>.</td>
+</tr>
+<tr>
+<td>Composite key</td>
+<td>A key made from multiple columns. A gate/group link is identified by
+both IDs together.</td>
+</tr>
+<tr>
+<td><code>NULL</code></td>
+<td>A missing or not-applicable value. It is not zero, an empty string,
+or automatically an error.</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>The database’s fallback when an INSERT omits a column. Explicit NULL
+is different from omission.</td>
+</tr>
+<tr>
+<td><code>UNIQUE</code></td>
+<td>A database rule preventing duplicate non-NULL keys. It does not
+automatically validate spelling or format.</td>
+</tr>
+<tr>
+<td><code>CHECK</code></td>
+<td>A rule tested against a row, such as an event ending after it
+starts.</td>
+</tr>
+<tr>
+<td>Index</td>
+<td>An extra lookup structure that helps queries find rows faster; it
+adds storage and write cost.</td>
+</tr>
+<tr>
+<td>Transaction</td>
+<td>A group of operations committed together or rolled back
+together.</td>
+</tr>
+<tr>
+<td>Trigger</td>
+<td>SQL that MySQL automatically runs when a specified table is inserted
+into or updated.</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>A versioned change to the database’s structure or rules.</td>
+</tr>
+<tr>
+<td>Soft delete</td>
+<td>Mark a record deleted using <code>deleted_at</code>, while
+physically retaining it.</td>
+</tr>
+<tr>
+<td>Hard delete</td>
+<td>Actually remove a row with DELETE, potentially activating
+foreign-key delete rules.</td>
+</tr>
+</tbody>
+</table>
+<p>A key distinction: <strong>an ID has meaning only with its
+table</strong>. User 20, account holder 20, and personal-info record 20
+can refer to three different things. Never substitute IDs merely because
+their numbers match.</p>
+<h2 id="the-three-identities-to-understand-first">3. The three
+identities to understand first</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Table</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login identity</td>
+<td><code>users</code></td>
+<td>Who can authenticate to the application?</td>
+</tr>
+<tr>
+<td>Estate membership</td>
+<td><code>account_holders</code></td>
+<td>Which user belongs to which estate context?</td>
+</tr>
+<tr>
+<td>Person’s estate profile</td>
+<td><code>personal_info</code></td>
+<td>What is this person’s name, estate, role, and access group?</td>
+</tr>
+</tbody>
+</table>
+<p>Example: fictional user <strong>20</strong> has membership
+<strong>81</strong>, which points to personal-info record
+<strong>300</strong> in estate <strong>5</strong>. The path is
+<code>users.id=20 ← account_holders.user_id</code>, followed by
+<code>account_holders.personal_info_id=300 → personal_info.id</code>,
+followed by <code>personal_info.estate_id=5 → estates.id</code>.</p>
+<p>The account holder’s estate is obtained through personal info;
+<code>account_holders</code> does not have its own
+<code>estate_id</code>. One login may have memberships in multiple
+estates. The rule is at most one <strong>non-soft-deleted</strong>
+membership for a user in an estate, not one membership for the entire
+system.</p>
+<p>A guest also has personal information but does not need a login. A
+guest’s <code>personal_info_id</code> describes the guest, while
+<code>creator_id</code> identifies the inviting account holder. Joining
+a guest’s personal-info record to an account holder’s personal-info
+record does not, in general, reveal the guest’s host.</p>
+<figure>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 480" role="img" aria-labelledby="diagramTitle diagramDesc">
+<title id="diagramTitle">
+Core Gate Access relationships
+</title>
+<desc id="diagramDesc">An account holder references a user and personal
+information. The profile references its estate, role and access group.
+Guests and events reference account holders, while registrations
+reference guests and events.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#006c79"/></marker></defs>
+<g fill="none" stroke="#006c79" stroke-width="2" marker-end="url(#arrow)">
+<path d="M310 100 H220"/><path d="M510 100 H600"/><path d="M800 100 H870 V60 H910"/><path d="M870 100 V175 H910"/><path d="M870 100 V290 H910"/>
+<path d="M405 240 V135"/><path d="M130 340 V155 H310"/><path d="M505 270 H600"/><path d="M410 395 V305"/><path d="M305 395 H220"/>
+</g> <g fill="#ffffff" stroke="#b5ced8" stroke-width="1.5">
+<rect x="25" y="65" width="195" height="70" rx="9"/><rect x="310" y="65" width="200" height="70" rx="9"/><rect x="600" y="65" width="200" height="70" rx="9"/>
+<rect x="910" y="30" width="115" height="60" rx="9"/><rect x="910" y="145" width="115" height="60" rx="9"/><rect x="900" y="260" width="130" height="60" rx="9"/>
+<rect x="305" y="235" width="200" height="70" rx="9"/><rect x="600" y="235" width="220" height="70" rx="9"/><rect x="25" y="360" width="195" height="70" rx="9"/><rect x="305" y="360" width="220" height="70" rx="9"/>
+</g>
+<g font-family="system-ui, sans-serif" font-size="17" fill="#17283c" text-anchor="middle">
+<text x="122" y="94">users<tspan x="122" dy="24" font-size="13">Login
+identity</tspan></text>
+<text x="410" y="94">account_holders<tspan x="410" dy="24" font-size="13">Estate
+membership</tspan></text>
+<text x="700" y="94">personal_info<tspan x="700" dy="24" font-size="13">Member
+profile</tspan></text>
+<text x="968" y="67">estates</text><text x="968" y="172" font-size="13">account_types<tspan x="968" dy="18">Role</tspan></text>
+<text x="965" y="287" font-size="13">access_groups<tspan x="965" dy="18">Physical
+access</tspan></text>
+<text x="405" y="264">guests<tspan x="405" dy="24" font-size="13">Visitor
+/ invitation</tspan></text>
+<text x="710" y="264">personal_info<tspan x="710" dy="24" font-size="13">Guest’s
+own profile</tspan></text>
+<text x="122" y="390">events<tspan x="122" dy="24" font-size="13">Gathering
+and capacity</tspan></text>
+<text x="415" y="390">event_registers<tspan x="415" dy="24" font-size="13">Guest
+↔︎ event assignment</tspan></text> </g>
+<g font-family="system-ui, sans-serif" font-size="12" fill="#53647a"><text x="238" y="87">user_id</text><text x="515" y="87">profile
+ID</text><text x="415" y="194">creator_id</text><text x="138" y="327">creator_id</text><text x="530" y="256">profile
+ID</text><text x="417" y="337">guest_id</text><text x="236" y="385">event_id</text></g>
+</svg>
+<figcaption>
+Arrows point from a referencing record to its parent. Guest and host
+profiles are separate records in the same personal_info table.
+</figcaption>
+</figure>
+<p>The arrows illustrate navigation, not strict mandatory one-to-one
+cardinality. Several foreign keys are nullable, and
+<code>personal_info_id</code> is not generally UNIQUE on its referring
+tables.</p>
+<h2 id="table-directory-and-detailed-reference">4. Table directory and
+detailed reference</h2>
+<p>There are <strong>25 application tables</strong>, plus Alembic’s
+administrative <code>alembic_version</code> table. The sections below
+include every modeled column, its MySQL type, whether NULL is allowed,
+and the database default. Constraints and indexes are extracted from the
+actual SQLAlchemy metadata, rather than guessed from column names.</p>
+<p>Common conventions: <code>date_created</code> records insertion time;
+<code>date_updated</code> records the latest SQL UPDATE through a
+trigger, including updates that assign the same value. These are not a
+full history of changes. Integer standalone primary keys normally
+auto-increment. Link-table composite keys and <code>faces.id</code> do
+not.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Table</th>
+<th>Main responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#table-users">users</a></td>
+<td>The authentication identity</td>
+</tr>
+<tr>
+<td><a href="#table-pending-users">pending_users</a></td>
+<td>A staging area for an unverified login registration, including its
+OTP and expiry.</td>
+</tr>
+<tr>
+<td><a href="#table-estates">estates</a></td>
+<td>The communities or sites managed by the system</td>
+</tr>
+<tr>
+<td><a href="#table-account-types">account_types</a></td>
+<td>The catalogue of roles or account categories</td>
+</tr>
+<tr>
+<td><a href="#table-privileges">privileges</a></td>
+<td>The catalogue of named actions, such as CREATE_GUESTS or
+VIEW_LOGS.</td>
+</tr>
+<tr>
+<td><a
+href="#table-account-type-privilege-links">account_type_privilege_links</a></td>
+<td>The many-to-many connection between roles and privileges.</td>
+</tr>
+<tr>
+<td><a href="#table-access-groups">access_groups</a></td>
+<td>Named physical-access categories within an estate, such as REGULAR
+or MANAGEMENT.</td>
+</tr>
+<tr>
+<td><a href="#table-personal-info">personal_info</a></td>
+<td>An estate-specific profile containing a person’s name, optional
+identity/contact information, role, access group, and optional
+expiry.</td>
+</tr>
+<tr>
+<td><a href="#table-account-holders">account_holders</a></td>
+<td>The membership that connects a login user to an estate profile and
+house address</td>
+</tr>
+<tr>
+<td><a
+href="#table-pending-account-holders">pending_account_holders</a></td>
+<td>An invitation or membership record waiting for
+acceptance/verification, including the intended profile, house address,
+email, and optional parent account holder.</td>
+</tr>
+<tr>
+<td><a
+href="#table-personal-info-privilege-links">personal_info_privilege_links</a></td>
+<td>Individual privilege grants attached to a profile rather than a
+role.</td>
+</tr>
+<tr>
+<td><a href="#table-gates">gates</a></td>
+<td>The estate’s access points and selected controller-health
+information.</td>
+</tr>
+<tr>
+<td><a
+href="#table-gate-access-group-links">gate_access_group_links</a></td>
+<td>The many-to-many connection between gates and access groups, with a
+permitted time window for each pair.</td>
+</tr>
+<tr>
+<td><a
+href="#table-personal-info-gate-links">personal_info_gate_links</a></td>
+<td>A direct gate-access relationship for a particular profile, with its
+own opening and closing times.</td>
+</tr>
+<tr>
+<td><a href="#table-vehicles">vehicles</a></td>
+<td>Vehicle details associated with a personal-info record: plate, make,
+model, and color.</td>
+</tr>
+<tr>
+<td><a href="#table-guests">guests</a></td>
+<td>The visit/guest record, with an optional personal profile, an
+optional inviting account holder, status, and JSON details.</td>
+</tr>
+<tr>
+<td><a href="#table-events">events</a></td>
+<td>An event owned by an account holder, with its name, capacity, and
+start/end instants.</td>
+</tr>
+<tr>
+<td><a href="#table-event-registers">event_registers</a></td>
+<td>The join records assigning guests to events.</td>
+</tr>
+<tr>
+<td><a href="#table-faces">faces</a></td>
+<td>A mapping from a face identifier to a guest record.</td>
+</tr>
+<tr>
+<td><a href="#table-accesslog">accesslog</a></td>
+<td>A concise history of gate activity keyed by vehicle plate, event
+text, gate, and timestamp.</td>
+</tr>
+<tr>
+<td><a href="#table-logs">logs</a></td>
+<td>General application/audit messages, optionally associated with an
+estate, an actor user, a target account holder, and a vehicle
+plate.</td>
+</tr>
+<tr>
+<td><a href="#table-messagedb">messagedb</a></td>
+<td>Topic-labelled messages stored as text with their creation time and
+an optional originating gate.</td>
+</tr>
+<tr>
+<td><a href="#table-system-metrics">system_metrics</a></td>
+<td>Time-series readings from gate/controller infrastructure, such as
+temperatures, camera availability, services, and storage usage.</td>
+</tr>
+<tr>
+<td><a href="#table-user-reports">user_reports</a></td>
+<td>Issue reports submitted by a login user, with subject and detailed
+description.</td>
+</tr>
+<tr>
+<td><a href="#table-report-status">report_status</a></td>
+<td>The current status associated with a report.</td>
+</tr>
+</tbody>
+</table>
+<p><a id="table-users"></a></p>
+<h3 id="users">4.1. <code>users</code></h3>
+<p>The authentication identity. Stores login identifiers, a password
+representation, account flags, password-reset information, and a
+soft-delete marker.</p>
+<p><strong>How it works:</strong> A resident signs up with an email or
+phone number. Once registration is verified, the API can establish a
+user account. Estate memberships are separate records, so the same login
+can serve more than one estate.</p>
+<p><strong>Why this structure:</strong> Keeping authentication separate
+avoids copying a password into every estate membership. The password and
+reset OTP columns are intended for protected representations produced by
+application code; MySQL does not hash their contents automatically.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Email identifier; normalization and verification belong to the
+application.</td>
+</tr>
+<tr>
+<td><code>phone_number</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Phone identifier; canonical formatting and verification belong to
+the application.</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Password representation supplied by the application; the database
+does not hash it.</td>
+</tr>
+<tr>
+<td><code>reset_otp</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Protected password-reset OTP representation, when a reset is in
+progress.</td>
+</tr>
+<tr>
+<td><code>reset_expiry</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Expiry instant for the reset workflow.</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td><code>BOOL</code></td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Activation flag. Separate from deleted_at; inactive is not the same
+as deleted.</td>
+</tr>
+<tr>
+<td><code>is_admin</code></td>
+<td><code>BOOL</code></td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Application administrator flag; the API decides which operations it
+authorizes.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+<tr>
+<td><code>deleted_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>NULL means not soft-deleted; a timestamp marks soft deletion. Does
+not physically remove the row.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>CHECK:
+<code>email IS NOT NULL OR phone_number IS NOT NULL</code>.</li>
+<li>Index <code>ix_users_deleted_at</code>:
+<code>users.deleted_at</code>.</li>
+<li>UNIQUE index <code>uq_users_email</code>:
+<code>(CASE WHEN deleted_at IS NULL THEN email ELSE NULL END)</code>.</li>
+<li>UNIQUE index <code>uq_users_phone_number</code>:
+<code>(CASE WHEN deleted_at IS NULL THEN phone_number ELSE NULL END)</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> At least one of email and
+phone must be non-NULL. Functional UNIQUE indexes enforce identifier
+uniqueness only for rows with deleted_at IS NULL. is_active=False does
+not release an identifier. Database checks do not establish valid email
+syntax, phone normalization, password strength, or that an administrator
+is authorized to change is_admin.</p>
+<p><a id="table-pending-users"></a></p>
+<h3 id="pending_users">4.2. <code>pending_users</code></h3>
+<p>A staging area for an unverified login registration, including its
+OTP and expiry.</p>
+<p><strong>How it works:</strong> The application creates or refreshes a
+pending registration, verifies the supplied OTP and expiry, and then
+creates the actual user. Application code must complete the transition;
+no database trigger promotes pending users.</p>
+<p><strong>Why this structure:</strong> Separating unverified
+registrations from users keeps the authentication table focused on
+established accounts. Wider OTP columns accommodate hashed values rather
+than limiting storage to a few display digits.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Email identifier; normalization and verification belong to the
+application.</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Password representation supplied by the application; the database
+does not hash it.</td>
+</tr>
+<tr>
+<td><code>phone_number</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Phone identifier; canonical formatting and verification belong to
+the application.</td>
+</tr>
+<tr>
+<td><code>otp</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>OTP representation; application code is responsible for generating,
+protecting, and verifying it.</td>
+</tr>
+<tr>
+<td><code>otp_expiry</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>OTP expiry instant; application checks whether it has passed.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>UNIQUE: <code>email</code>.</li>
+<li>UNIQUE: <code>phone_number</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Email and phone each have
+ordinary UNIQUE rules, but can be NULL. Unlike users, this table has no
+at-least-one-identifier CHECK and no soft delete. Expired rows are not
+deleted automatically by a trigger; cleanup and verification are
+application responsibilities.</p>
+<p><a id="table-estates"></a></p>
+<h3 id="estates">4.3. <code>estates</code></h3>
+<p>The communities or sites managed by the system. Each estate has a
+name and a location representation.</p>
+<p><strong>How it works:</strong> Creating Cedar Court inserts an estate
+and automatically creates its REGULAR access group in the same
+transaction.</p>
+<p><strong>Why this structure:</strong> An estate is the boundary around
+profiles, gates, access groups, and much of authorization. Keeping it as
+a parent avoids repeating estate details on every record.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>location_coordinates</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Location stored as a unique VARCHAR string, not a validated
+geospatial type.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>UNIQUE: <code>location_coordinates</code>.</li>
+<li>UNIQUE: <code>name</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Name and location_coordinates
+are independently UNIQUE. Coordinates are stored as text, not a spatial
+POINT; MySQL does not validate latitude/longitude format here. Hard
+deletion cascades into estate-owned tables, while related logs retain
+their text and lose the estate reference.</p>
+<p><a id="table-account-types"></a></p>
+<h3 id="account_types">4.4. <code>account_types</code></h3>
+<p>The catalogue of roles or account categories. A profile chooses one
+account type.</p>
+<p><strong>How it works:</strong> A role such as USER_A can be
+associated with CREATE_GUESTS through account_type_privilege_links. The
+role is assigned through personal_info.account_type_id.</p>
+<p><strong>Why this structure:</strong> Role names live in one table so
+many people can share a consistent role and its baseline
+permissions.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>UNIQUE: <code>name</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The local fresh-install seed
+lists ADMIN, USER_A, GUEST, and WORKER. A transferred database can
+contain additional roles and preserves their IDs. Never assume all
+production role IDs from a fresh seed. The database permits any unique
+name; role meaning is supplied by application policy.</p>
+<p><a id="table-privileges"></a></p>
+<h3 id="privileges">4.5. <code>privileges</code></h3>
+<p>The catalogue of named actions, such as CREATE_GUESTS or
+VIEW_LOGS.</p>
+<p><strong>How it works:</strong> A privilege is attached either to an
+account type or directly to a personal-info record through the
+appropriate link table.</p>
+<p><strong>Why this structure:</strong> A catalogue lets permissions be
+combined without adding a new Boolean column every time the application
+introduces an action.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>UNIQUE: <code>name</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> A privilege name does not
+enforce itself. API authorization code must check it before acting.
+Names must match the strings expected by that code. The database does
+not automatically grant every privilege to an account marked
+is_admin.</p>
+<p><a id="table-account-type-privilege-links"></a></p>
+<h3 id="account_type_privilege_links">4.6.
+<code>account_type_privilege_links</code></h3>
+<p>The many-to-many connection between roles and privileges.</p>
+<p><strong>How it works:</strong> A role can have many privilege links,
+and one privilege can be shared by several roles. The pair
+(account_type_id, privilege_id) identifies one assignment.</p>
+<p><strong>Why this structure:</strong> A composite primary key
+represents the relationship directly and prevents the same permission
+from being assigned twice to the same role.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>account_type_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the role/category catalogue.</td>
+</tr>
+<tr>
+<td><code>privilege_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a named application permission.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>account_type_id</code>,
+<code>privilege_id</code>.</li>
+<li>Foreign key: <code>account_type_id</code> →
+<code>account_types.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>privilege_id</code> → <code>privileges.id</code>;
+on hard delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_account_type_privilege_links_privilege_id</code>:
+<code>account_type_privilege_links.privilege_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> This stores baseline grants,
+not explicit denials. Removing a link removes that role grant, but a
+person might still hold a direct grant or satisfy another application
+authorization rule.</p>
+<p><a id="table-access-groups"></a></p>
+<h3 id="access_groups">4.7. <code>access_groups</code></h3>
+<p>Named physical-access categories within an estate, such as REGULAR or
+MANAGEMENT.</p>
+<p><strong>How it works:</strong> A profile belongs to one access group.
+Linking that group to a gate allows the API to consider the group’s
+members when calculating access.</p>
+<p><strong>Why this structure:</strong> Groups let many people share
+gate access and time windows without inserting a separate record for
+every person/gate pair.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>estate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the estate/site that owns this record.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>estate_id</code> → <code>estates.id</code>; on
+hard delete: <strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>name</code>, <code>estate_id</code>.</li>
+<li>Index <code>ix_access_groups_estate_id</code>:
+<code>access_groups.estate_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Group names are unique within
+an estate, not globally. REGULAR can exist in several estates. A role
+controls application actions; an access group describes physical access.
+They are separate concepts even when their names sound similar.</p>
+<p><a id="table-personal-info"></a></p>
+<h3 id="personal_info">4.8. <code>personal_info</code></h3>
+<p>An estate-specific profile containing a person’s name, optional
+identity/contact information, role, access group, and optional
+expiry.</p>
+<p><strong>How it works:</strong> A resident’s account holder points
+here; a guest or pending invitation can also point here. A person
+without a login can still have a profile and a vehicle.</p>
+<p><strong>Why this structure:</strong> The shared profile lets
+residents and guests participate in common physical-access relationships
+without requiring everyone to have authentication credentials.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>estate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the estate/site that owns this record.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>id_type</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional identity-document category.</td>
+</tr>
+<tr>
+<td><code>id_num</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional identity-document identifier; unique with type and estate
+when all are non-NULL.</td>
+</tr>
+<tr>
+<td><code>contact</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Profile contact text; distinct from the login’s verified
+phone/email.</td>
+</tr>
+<tr>
+<td><code>expiry</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional profile/access expiry instant; application must evaluate
+it.</td>
+</tr>
+<tr>
+<td><code>account_type_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>1</code></td>
+<td>Reference to the role/category catalogue.</td>
+</tr>
+<tr>
+<td><code>access_group_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>1</code></td>
+<td>Reference to the physical-access group.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>access_group_id</code> →
+<code>access_groups.id</code>; on hard delete: <strong>RESTRICT / NO
+ACTION (block deletion while referenced)</strong>.</li>
+<li>Foreign key: <code>account_type_id</code> →
+<code>account_types.id</code>; on hard delete: <strong>RESTRICT / NO
+ACTION (block deletion while referenced)</strong>.</li>
+<li>Foreign key: <code>estate_id</code> → <code>estates.id</code>; on
+hard delete: <strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>id_type</code>, <code>id_num</code>,
+<code>estate_id</code>.</li>
+<li>Index <code>ix_personal_info_access_group_id</code>:
+<code>personal_info.access_group_id</code>.</li>
+<li>Index <code>ix_personal_info_account_type_id</code>:
+<code>personal_info.account_type_id</code>.</li>
+<li>Index <code>ix_personal_info_estate_id</code>:
+<code>personal_info.estate_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The tuple (id_type, id_num,
+estate_id) is UNIQUE, but NULL components allow multiple incomplete
+identities. Role and group default to numeric ID 1; an estate’s
+generated REGULAR group is not necessarily ID 1. The API should supply
+the correct role and same-estate group explicitly. Existing foreign keys
+alone do not enforce that group and profile belong to the same estate. A
+guard trigger blocks changing estate_id when any account-holder row
+references the profile.</p>
+<p><a id="table-account-holders"></a></p>
+<h3 id="account_holders">4.9. <code>account_holders</code></h3>
+<p>The membership that connects a login user to an estate profile and
+house address. It can also describe a subordinate account through a
+parent membership reference.</p>
+<p><strong>How it works:</strong> User 20 joins Cedar Court: insert
+personal info in that estate, then insert an account holder referencing
+user 20 and that profile. Activation and soft deletion are separate from
+the initial insertion.</p>
+<p><strong>Why this structure:</strong> An estate membership is the
+correct owner for estate-specific invitations and events. It identifies
+both the person and the context in which they act. The parent membership
+field supports household or delegated accounts.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a login identity in users.</td>
+</tr>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>house_address</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Membership or invitation house/unit address.</td>
+</tr>
+<tr>
+<td><code>otp</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>OTP representation; application code is responsible for generating,
+protecting, and verifying it.</td>
+</tr>
+<tr>
+<td><code>otp_generated_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Timestamp used by the application’s OTP workflow; inspect the
+handler for its validity calculation.</td>
+</tr>
+<tr>
+<td><code>owner_account_holder_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional parent/owning membership for a subordinate account or
+invitation.</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td><code>BOOL</code></td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Activation flag. Separate from deleted_at; inactive is not the same
+as deleted.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+<tr>
+<td><code>deleted_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>NULL means not soft-deleted; a timestamp marks soft deletion. Does
+not physically remove the row.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>owner_account_holder_id</code> →
+<code>account_holders.id</code>; on hard delete: <strong>SET
+NULL</strong>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>user_id</code> → <code>users.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_account_holders_deleted_at</code>:
+<code>account_holders.deleted_at</code>.</li>
+<li>Index <code>ix_account_holders_owner_account_holder_id</code>:
+<code>account_holders.owner_account_holder_id</code>.</li>
+<li>Index <code>ix_account_holders_personal_info_id</code>:
+<code>account_holders.personal_info_id</code>.</li>
+<li>Index <code>ix_account_holders_user_id</code>:
+<code>account_holders.user_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The membership trigger counts
+non-soft-deleted rows, regardless of is_active. is_active defaults
+false. personal_info_id is nullable; a row without it has no resolvable
+estate and bypasses that uniqueness check. Hard-deleting the parent
+membership sets owner_account_holder_id to NULL in existing child
+memberships, but does not delete those children through that
+self-reference. No CHECK prevents self-parenting or cycles; application
+validation is needed.</p>
+<p><a id="table-pending-account-holders"></a></p>
+<h3 id="pending_account_holders">4.10.
+<code>pending_account_holders</code></h3>
+<p>An invitation or membership record waiting for
+acceptance/verification, including the intended profile, house address,
+email, and optional parent account holder.</p>
+<p><strong>How it works:</strong> The subaccount API creates an
+invitation and verifies its OTP before establishing the real membership.
+This table has no user_id column.</p>
+<p><strong>Why this structure:</strong> A person may be invited before
+their login is ready. Keeping pending membership separate avoids
+pretending that the invitation already represents a completed user
+membership.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>house_address</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Membership or invitation house/unit address.</td>
+</tr>
+<tr>
+<td><code>otp</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>OTP representation; application code is responsible for generating,
+protecting, and verifying it.</td>
+</tr>
+<tr>
+<td><code>otp_generated_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Timestamp used by the application’s OTP workflow; inspect the
+handler for its validity calculation.</td>
+</tr>
+<tr>
+<td><code>owner_account_holder_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional parent/owning membership for a subordinate account or
+invitation.</td>
+</tr>
+<tr>
+<td><code>is_pending</code></td>
+<td><code>BOOL</code></td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Whether the application considers this membership invitation
+pending; default true.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Email identifier; normalization and verification belong to the
+application.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>owner_account_holder_id</code> →
+<code>account_holders.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>email</code>.</li>
+<li>Index
+<code>ix_pending_account_holders_owner_account_holder_id</code>:
+<code>pending_account_holders.owner_account_holder_id</code>.</li>
+<li>Index <code>ix_pending_account_holders_personal_info_id</code>:
+<code>pending_account_holders.personal_info_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Email is nullable and globally
+UNIQUE in this table, so one non-NULL email cannot have two simultaneous
+pending rows even in different estates. is_pending defaults true. Unlike
+completed child memberships, its parent FK uses CASCADE: hard-deleting
+the parent deletes the pending invitation. OTP validity is checked by
+application code, not a trigger.</p>
+<p><a id="table-personal-info-privilege-links"></a></p>
+<h3 id="personal_info_privilege_links">4.11.
+<code>personal_info_privilege_links</code></h3>
+<p>Individual privilege grants attached to a profile rather than a
+role.</p>
+<p><strong>How it works:</strong> Two residents share USER_A, but one
+receives VIEW_LOGS directly. The inspected API privilege helper combines
+role grants and profile grants.</p>
+<p><strong>Why this structure:</strong> Direct grants provide individual
+exceptions without inventing a new role for every combination of
+permissions. Attaching grants to a profile makes them
+estate-contextual.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>privilege_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a named application permission.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>personal_info_id</code>,
+<code>privilege_id</code>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>privilege_id</code> → <code>privileges.id</code>;
+on hard delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_personal_info_privilege_links_privilege_id</code>:
+<code>personal_info_privilege_links.privilege_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The composite primary key
+prevents duplicate assignments. This table has no deny flag, expiry, or
+grantor column. It cannot by itself remove a role-level permission or
+preserve a permission-change audit trail.</p>
+<p><a id="table-gates"></a></p>
+<h3 id="gates">4.12. <code>gates</code></h3>
+<p>The estate’s access points and selected controller-health
+information.</p>
+<p><strong>How it works:</strong> A controller heartbeat updates
+last_controller_heartbeat; API queries combine gate hours with
+group/person gate-link hours when deciding access.</p>
+<p><strong>Why this structure:</strong> Gate identity, normal operating
+hours, and current controller state belong together, while historical
+device readings belong in system_metrics.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>estate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the estate/site that owns this record.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>last_controller_heartbeat</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Most recently stored controller heartbeat time; insertion supplies
+an initial default.</td>
+</tr>
+<tr>
+<td><code>opening_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'00:00:00'</code></td>
+<td>Time of day when the gate/access window begins; no date or timezone
+is stored in TIME.</td>
+</tr>
+<tr>
+<td><code>closing_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'23:59:59'</code></td>
+<td>Time of day when the gate/access window ends; application handles
+window interpretation.</td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td><code>BOOL</code></td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Whether the gate is enabled in application policy.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+<tr>
+<td><code>last_alert_sent_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional time used to track/throttle gate alerts.</td>
+</tr>
+<tr>
+<td><code>snr</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Signal-to-noise measurement stored as a string; units/format belong
+to the producer.</td>
+</tr>
+<tr>
+<td><code>rssi</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Received-signal measurement stored as a string; units/format belong
+to the producer.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>estate_id</code> → <code>estates.id</code>; on
+hard delete: <strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>name</code>, <code>estate_id</code>.</li>
+<li>Index <code>ix_gates_estate_id</code>:
+<code>gates.estate_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Names are unique per estate.
+active defaults true. The heartbeat defaults to insertion time; that
+initial value is not proof a real device has contacted the server. snr
+and rssi are strings in this schema. Time-window enforcement, overnight
+handling, and alert scheduling are application behavior, not automatic
+gate-opening triggers.</p>
+<p><a id="table-gate-access-group-links"></a></p>
+<h3 id="gate_access_group_links">4.13.
+<code>gate_access_group_links</code></h3>
+<p>The many-to-many connection between gates and access groups, with a
+permitted time window for each pair.</p>
+<p><strong>How it works:</strong> The REGULAR group may use the main
+gate all day but a service gate only during specified hours. Each pair
+has one row.</p>
+<p><strong>Why this structure:</strong> The schedule belongs to the
+permission relationship: two groups can use the same gate on different
+schedules.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a physical gate/controller record.</td>
+</tr>
+<tr>
+<td><code>access_group_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the physical-access group.</td>
+</tr>
+<tr>
+<td><code>opening_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'00:00:00'</code></td>
+<td>Time of day when the gate/access window begins; no date or timezone
+is stored in TIME.</td>
+</tr>
+<tr>
+<td><code>closing_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'23:59:59'</code></td>
+<td>Time of day when the gate/access window ends; application handles
+window interpretation.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>gate_id</code>,
+<code>access_group_id</code>.</li>
+<li>Foreign key: <code>access_group_id</code> →
+<code>access_groups.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>gate_id</code> → <code>gates.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_gate_access_group_links_access_group_id</code>:
+<code>gate_access_group_links.access_group_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The key is (gate_id,
+access_group_id). Foreign keys ensure both records exist, but do not
+ensure they belong to the same estate. The database accepts time values;
+it does not decide whether a window crosses midnight or how overlapping
+schedules should combine.</p>
+<p><a id="table-personal-info-gate-links"></a></p>
+<h3 id="personal_info_gate_links">4.14.
+<code>personal_info_gate_links</code></h3>
+<p>A direct gate-access relationship for a particular profile, with its
+own opening and closing times.</p>
+<p><strong>How it works:</strong> A profile can be assigned to a gate
+individually in addition to the relationships available through its
+access group. API access queries decide how these paths are
+combined.</p>
+<p><strong>Why this structure:</strong> This accommodates individual
+gate assignments without moving the person into a different access group
+just for one gate.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a physical gate/controller record.</td>
+</tr>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>opening_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'00:00:00'</code></td>
+<td>Time of day when the gate/access window begins; no date or timezone
+is stored in TIME.</td>
+</tr>
+<tr>
+<td><code>closing_time</code></td>
+<td><code>TIME</code></td>
+<td>No</td>
+<td><code>'23:59:59'</code></td>
+<td>Time of day when the gate/access window ends; application handles
+window interpretation.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>gate_id</code>,
+<code>personal_info_id</code>.</li>
+<li>Foreign key: <code>gate_id</code> → <code>gates.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Index <code>ix_personal_info_gate_links_personal_info_id</code>:
+<code>personal_info_gate_links.personal_info_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The pair (gate_id,
+personal_info_id) is the primary key. It is not an explicit deny rule.
+Gate/profile same-estate validation and schedule interpretation must be
+performed by the application.</p>
+<p><a id="table-vehicles"></a></p>
+<h3 id="vehicles">4.15. <code>vehicles</code></h3>
+<p>Vehicle details associated with a personal-info record: plate, make,
+model, and color.</p>
+<p><strong>How it works:</strong> A resident or guest profile can have
+multiple vehicles. The gate API can find a vehicle’s person and evaluate
+the person’s permitted gates.</p>
+<p><strong>Why this structure:</strong> Linking vehicles to personal
+info supports both residents and guests rather than requiring a user
+login for every vehicle owner.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>license_plate_number</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Plate text. This column is not a foreign key to a vehicle.</td>
+</tr>
+<tr>
+<td><code>make</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Vehicle manufacturer text.</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Vehicle model text.</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Vehicle color text.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Index <code>ix_vehicles_license_plate_number</code>:
+<code>vehicles.license_plate_number</code>.</li>
+<li>Index <code>ix_vehicles_personal_info_id</code>:
+<code>vehicles.personal_info_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> license_plate_number is
+indexed but NOT UNIQUE. Do not infer a global one-row-per-plate
+guarantee. personal_info_id is nullable, so the database permits an
+unassigned vehicle. Normalizing plate text and resolving duplicates
+remain application concerns.</p>
+<p><a id="table-guests"></a></p>
+<h3 id="guests">4.16. <code>guests</code></h3>
+<p>The visit/guest record, with an optional personal profile, an
+optional inviting account holder, status, and JSON details.</p>
+<p><strong>How it works:</strong> A resident invites a guest: create the
+guest profile, insert guests with creator_id equal to the resident’s
+ACCOUNT-HOLDER ID, and optionally register that guest for an event.</p>
+<p><strong>Why this structure:</strong> Ownership by membership aligns
+invitations with the host’s estate context. JSON other_info can hold
+changing optional details without expanding the fixed relational schema
+for every extra property.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>personal_info_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to the person’s estate-specific profile; not a login user
+ID.</td>
+</tr>
+<tr>
+<td><code>creator_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>The inviting/owning account-holder ID, not the user ID.</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>No</td>
+<td><code>'EXPECTED'</code></td>
+<td>Application-defined state stored as text; allowed values are not
+restricted by a database enum.</td>
+</tr>
+<tr>
+<td><code>other_info</code></td>
+<td><code>JSON</code></td>
+<td>No</td>
+<td><code>(JSON_OBJECT())</code></td>
+<td>Flexible JSON visit details. Empty-object default; no enforced
+object schema.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>creator_id</code> →
+<code>account_holders.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>personal_info_id</code> →
+<code>personal_info.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>Index <code>ix_guests_creator_id</code>:
+<code>guests.creator_id</code>.</li>
+<li>Index <code>ix_guests_personal_info_id</code>:
+<code>guests.personal_info_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> creator_id now references
+account_holders.id, not users.id. Both creator_id and personal_info_id
+can be NULL. status defaults EXPECTED but is a string, not a database
+enum. There is no constraint requiring host and guest profiles to share
+an estate; the API must validate that. JSON validity is enforced by the
+type, but an object shape is not enforced by a CHECK.</p>
+<p><a id="table-events"></a></p>
+<h3 id="events">4.17. <code>events</code></h3>
+<p>An event owned by an account holder, with its name, capacity, and
+start/end instants.</p>
+<p><strong>How it works:</strong> A resident creates a meeting with
+capacity 10. Each registered guest contributes one event_registers
+row.</p>
+<p><strong>Why this structure:</strong> The event describes the
+gathering; the separate register describes attendance. This allows
+several guests to share an event and a guest to participate in multiple
+events.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>creator_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>The inviting/owning account-holder ID, not the user ID.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Human-readable name; uniqueness depends on the constraints listed
+below.</td>
+</tr>
+<tr>
+<td><code>max_num_of_attendees</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Maximum registration count checked by capacity triggers.</td>
+</tr>
+<tr>
+<td><code>start_time</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Event start instant, represented as UTC DATETIME(6).</td>
+</tr>
+<tr>
+<td><code>end_time</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Event end instant; must be later than start_time.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>creator_id</code> →
+<code>account_holders.id</code>; on hard delete:
+<strong>CASCADE</strong>.</li>
+<li>CHECK: <code>end_time &gt; start_time</code>.</li>
+<li>Index <code>ix_events_creator_id</code>:
+<code>events.creator_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> CHECK enforces end_time &gt;
+start_time. There is no CHECK requiring a positive capacity. Capacity is
+tested on registration insert/move, not when reducing
+max_num_of_attendees; lowering it below existing attendance needs
+application validation. The event has no direct estate_id; context comes
+through its creator membership.</p>
+<p><a id="table-event-registers"></a></p>
+<h3 id="event_registers">4.18. <code>event_registers</code></h3>
+<p>The join records assigning guests to events.</p>
+<p><strong>How it works:</strong> One row means guest 70 is registered
+for event 15. UNIQUE(event_id, guest_id) prevents duplicate registration
+for that pair.</p>
+<p><strong>Why this structure:</strong> This separates attendance from
+guest identity and allows the database to enforce both pair uniqueness
+and event capacity.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>event_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to an event.</td>
+</tr>
+<tr>
+<td><code>guest_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a guest record.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>event_id</code> → <code>events.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Foreign key: <code>guest_id</code> → <code>guests.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>event_id</code>, <code>guest_id</code>.</li>
+<li>Index <code>ix_event_registers_event_id</code>:
+<code>event_registers.event_id</code>.</li>
+<li>Index <code>ix_event_registers_guest_id</code>:
+<code>event_registers.guest_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> Capacity triggers run before
+INSERT and before UPDATE when event_id changes. Updating only guest_id
+does not increase attendance, so it does not run the capacity count. All
+registration rows count; guest status does not automatically exclude a
+registration. There is no waiting-list or cancelled flag here.</p>
+<p><a id="table-faces"></a></p>
+<h3 id="faces">4.19. <code>faces</code></h3>
+<p>A mapping from a face identifier to a guest record.</p>
+<p><strong>How it works:</strong> The inspected face API uses a
+recognition service identifier as faces.id and links it to the guest
+represented by that recognition result.</p>
+<p><strong>Why this structure:</strong> The table stores the database
+relationship to an external face-recognition identity rather than a
+binary photograph in the row.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>VARCHAR(64)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>External face identifier, stored as VARCHAR(64); supplied by the
+application.</td>
+</tr>
+<tr>
+<td><code>guest_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a guest record.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>guest_id</code> → <code>guests.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_faces_guest_id</code>:
+<code>faces.guest_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The primary key is a string up
+to 64 characters, not an auto-increment integer. guest_id is not UNIQUE,
+so multiple face IDs may refer to one guest. Cascading deletion removes
+local mappings but does not automatically delete images or records in
+external services; the API must coordinate that cleanup.</p>
+<p><a id="table-accesslog"></a></p>
+<h3 id="accesslog">4.20. <code>accesslog</code></h3>
+<p>A concise history of gate activity keyed by vehicle plate, event
+text, gate, and timestamp.</p>
+<p><strong>How it works:</strong> A controller reports a vehicle entry
+or exit. A row records the plate observed at a particular gate at a
+particular time.</p>
+<p><strong>Why this structure:</strong> Storing plate text preserves the
+observed identifier even if there is no vehicle row or the vehicle’s
+registration changes later.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>license_plate_number</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Plate text. This column is not a foreign key to a vehicle.</td>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Access-event label supplied by a controller/API; no enum
+validation.</td>
+</tr>
+<tr>
+<td><code>gate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a physical gate/controller record.</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Time associated with the access record; defaults to database
+insertion time if omitted.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>gate_id</code> → <code>gates.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_accesslog_gate_id</code>:
+<code>accesslog.gate_id</code>.</li>
+<li>Index <code>ix_accesslog_license_plate_number_timestamp</code>:
+<code>accesslog.license_plate_number, accesslog.timestamp</code>.</li>
+<li>Index <code>ix_accesslog_timestamp</code>:
+<code>accesslog.timestamp</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> There is no foreign key from
+license_plate_number to vehicles and no user_id/estate_id column. The
+gate links to the estate. Hard-deleting a gate cascades to these
+accesslog rows, so this table does not have the same retention behavior
+as logs.</p>
+<p><a id="table-logs"></a></p>
+<h3 id="logs">4.21. <code>logs</code></h3>
+<p>General application/audit messages, optionally associated with an
+estate, an actor user, a target account holder, and a vehicle plate.</p>
+<p><strong>How it works:</strong> The application records that a user
+invited a guest, changed a membership, or performed another relevant
+action. A message can remain even if its referenced user is later
+hard-deleted.</p>
+<p><strong>Why this structure:</strong> SET NULL on the three foreign
+keys preserves the textual audit record instead of cascading its
+deletion when the actor, target, or estate disappears.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>estate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to the estate/site that owns this record.</td>
+</tr>
+<tr>
+<td><code>target_account_holder_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Membership affected by the logged action; becomes NULL if that
+membership is hard-deleted.</td>
+</tr>
+<tr>
+<td><code>actor_user_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Login identity performing the action; becomes NULL if that user is
+hard-deleted.</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Application-defined log category.</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>TEXT</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Text payload or descriptive message supplied by application
+code.</td>
+</tr>
+<tr>
+<td><code>license_plate_number</code></td>
+<td><code>VARCHAR(20)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Plate text. This column is not a foreign key to a vehicle.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>actor_user_id</code> → <code>users.id</code>; on
+hard delete: <strong>SET NULL</strong>.</li>
+<li>Foreign key: <code>estate_id</code> → <code>estates.id</code>; on
+hard delete: <strong>SET NULL</strong>.</li>
+<li>Foreign key: <code>target_account_holder_id</code> →
+<code>account_holders.id</code>; on hard delete: <strong>SET
+NULL</strong>.</li>
+<li>Index <code>ix_logs_actor_user_id</code>:
+<code>logs.actor_user_id</code>.</li>
+<li>Index <code>ix_logs_date_created</code>:
+<code>logs.date_created</code>.</li>
+<li>Index <code>ix_logs_estate_id</code>:
+<code>logs.estate_id</code>.</li>
+<li>Index <code>ix_logs_estate_id_date_created</code>:
+<code>logs.estate_id, logs.date_created</code>.</li>
+<li>Index <code>ix_logs_license_plate_number</code>:
+<code>logs.license_plate_number</code>.</li>
+<li>Index <code>ix_logs_target_account_holder_id</code>:
+<code>logs.target_account_holder_id</code>.</li>
+<li>Index <code>ix_logs_type</code>: <code>logs.type</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> These rows are written by
+application code; there is no trigger automatically logging every
+database operation. license_plate_number is plain text. SET NULL
+preserves messages but loses the live reference; this is not an
+immutable or cryptographically protected audit system.</p>
+<p><a id="table-messagedb"></a></p>
+<h3 id="messagedb">4.22. <code>messagedb</code></h3>
+<p>Topic-labelled messages stored as text with their creation time and
+an optional originating gate.</p>
+<p><strong>How it works:</strong> The heartbeat producer records the
+originating gate_id when queuing an alert. A dispatcher can join
+messagedb to gates to obtain the estate and restrict its recipients to
+that estate.</p>
+<p><strong>Why this structure:</strong> A separate message table keeps
+messages distinct from audit logs and metrics. The gate reference
+supplies estate context without duplicating estate_id. Topic, time, and
+gate indexes support lookup. Existing messages retain NULL gate_id
+because their origin cannot be safely guessed.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>gate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Reference to a physical gate/controller record.</td>
+</tr>
+<tr>
+<td><code>topic</code></td>
+<td><code>VARCHAR(100)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Message topic/category used for filtering or routing by application
+code.</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>TEXT</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Text payload or descriptive message supplied by application
+code.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>gate_id</code> → <code>gates.id</code>; on hard
+delete: <strong>SET NULL</strong>.</li>
+<li>Index <code>ix_messagedb_date_created</code>:
+<code>messagedb.date_created</code>.</li>
+<li>Index <code>ix_messagedb_gate_id</code>:
+<code>messagedb.gate_id</code>.</li>
+<li>Index <code>ix_messagedb_topic</code>:
+<code>messagedb.topic</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> NULL gate_id means
+unknown/unassigned origin, never permission to broadcast. Deleting a
+gate sets this field to NULL and keeps the message. Moving a gate
+between estates changes its derived estate, so that workflow needs
+control. The schema has no delivery status, retry count,
+acknowledgement, recipient FK, or expiry. It does not itself deliver
+messages or prevent a sender from selecting recipients incorrectly.
+message is TEXT. The old cross-estate dispatcher remains commented out
+and must not be re-enabled unchanged.</p>
+<p><a id="table-system-metrics"></a></p>
+<h3 id="system_metrics">4.23. <code>system_metrics</code></h3>
+<p>Time-series readings from gate/controller infrastructure, such as
+temperatures, camera availability, services, and storage usage.</p>
+<p><strong>How it works:</strong> A gate sends a reading at
+device_timestamp; received_at records when the backend receives/stores
+it. Comparing them can reveal delays or device clock problems.</p>
+<p><strong>Why this structure:</strong> Historical samples belong in a
+separate table so operational trends can be queried without overwriting
+the gate’s current heartbeat. Fixed-precision decimals preserve defined
+precision for temperature and storage values.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>gate_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a physical gate/controller record.</td>
+</tr>
+<tr>
+<td><code>device_timestamp</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>When the device says the sample was taken.</td>
+</tr>
+<tr>
+<td><code>temperature_celsius</code></td>
+<td><code>NUMERIC(6, 3)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Temperature in degrees Celsius, exact decimal with three fractional
+digits.</td>
+</tr>
+<tr>
+<td><code>total_cameras</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reported total camera count.</td>
+</tr>
+<tr>
+<td><code>online_cameras</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reported online camera count.</td>
+</tr>
+<tr>
+<td><code>running_services</code></td>
+<td><code>JSON</code></td>
+<td>No</td>
+<td><code>(JSON_OBJECT())</code></td>
+<td>JSON service-state payload; defaults to an empty object.</td>
+</tr>
+<tr>
+<td><code>storage_used_gb</code></td>
+<td><code>NUMERIC(12, 3)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reported used storage in GB, fixed precision with three fractional
+digits.</td>
+</tr>
+<tr>
+<td><code>storage_total_gb</code></td>
+<td><code>NUMERIC(12, 3)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reported storage capacity in GB, fixed precision with three
+fractional digits.</td>
+</tr>
+<tr>
+<td><code>offline_camera_ids</code></td>
+<td><code>JSON</code></td>
+<td>No</td>
+<td><code>(JSON_ARRAY())</code></td>
+<td>JSON offline-camera identifiers; defaults to an empty array.</td>
+</tr>
+<tr>
+<td><code>camera_alert_ts</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>Yes</td>
+<td><code>None</code></td>
+<td>Optional camera-alert timestamp supplied by the application/device
+workflow.</td>
+</tr>
+<tr>
+<td><code>received_at</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Backend receipt timestamp, independent of the device’s clock.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>gate_id</code> → <code>gates.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_system_metrics_device_timestamp</code>:
+<code>system_metrics.device_timestamp</code>.</li>
+<li>Index <code>ix_system_metrics_gate_id</code>:
+<code>system_metrics.gate_id</code>.</li>
+<li>Index <code>ix_system_metrics_received_at</code>:
+<code>system_metrics.received_at</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> JSON running_services defaults
+to an object; offline_camera_ids defaults to an array. Those defaults do
+not validate the structure of supplied JSON. There are no CHECK
+constraints enforcing online_cameras &lt;= total_cameras, nonnegative
+storage, or used &lt;= total. No automatic retention policy deletes old
+readings.</p>
+<p><a id="table-user-reports"></a></p>
+<h3 id="user_reports">4.24. <code>user_reports</code></h3>
+<p>Issue reports submitted by a login user, with subject and detailed
+description.</p>
+<p><strong>How it works:</strong> A resident reports a gate problem. The
+application creates the report and normally creates its initial
+report_status row in the same transaction.</p>
+<p><strong>Why this structure:</strong> The report content stays
+separate from its changing status. The author is a user, unlike guests
+and events whose owner is an account holder.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Reference to a login identity in users.</td>
+</tr>
+<tr>
+<td><code>subject</code></td>
+<td><code>VARCHAR(255)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Short report title.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>TEXT</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Detailed report contents.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>user_id</code> → <code>users.id</code>; on hard
+delete: <strong>CASCADE</strong>.</li>
+<li>Index <code>ix_user_reports_user_id</code>:
+<code>user_reports.user_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> There is no direct estate_id
+here. The user foreign key alone does not encode which estate the issue
+concerns. Hard-deleting the user cascades to their reports; a user soft
+delete leaves the records physically present.</p>
+<p><a id="table-report-status"></a></p>
+<h3 id="report_status">4.25. <code>report_status</code></h3>
+<p>The current status associated with a report.</p>
+<p><strong>How it works:</strong> A report moves from an initial state
+to a resolved state by updating the existing row. The inspected API uses
+UPDATE by report_id for status changes.</p>
+<p><strong>Why this structure:</strong> UNIQUE(report_id) prevents two
+current-status rows for the same report, avoiding ambiguous joins and
+inconsistent status displays.</p>
+<p><strong>Columns</strong></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>MySQL type</th>
+<th>NULL allowed?</th>
+<th>Database default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>AUTO_INCREMENT</code></td>
+<td>Identifier for this row; meaningful only within this table.</td>
+</tr>
+<tr>
+<td><code>report_id</code></td>
+<td><code>INTEGER</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Required UNIQUE link to user_reports: at most one current status per
+report.</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>VARCHAR(50)</code></td>
+<td>No</td>
+<td><code>None</code></td>
+<td>Application-defined state stored as text; allowed values are not
+restricted by a database enum.</td>
+</tr>
+<tr>
+<td><code>date_created</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Creation timestamp. Defaults to the database clock; treat stored
+DATETIME values as UTC.</td>
+</tr>
+<tr>
+<td><code>date_updated</code></td>
+<td><code>DATETIME(6)</code></td>
+<td>No</td>
+<td><code>CURRENT_TIMESTAMP(6)</code></td>
+<td>Last update timestamp maintained by the database trigger; not a
+history of earlier values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keys, relationships, and lookup rules</strong></p>
+<ul>
+<li>Primary key: <code>id</code>.</li>
+<li>Foreign key: <code>report_id</code> → <code>user_reports.id</code>;
+on hard delete: <strong>CASCADE</strong>.</li>
+<li>UNIQUE: <code>report_id</code>.</li>
+</ul>
+<p><strong>Important boundaries:</strong> The relationship is one report
+to ZERO OR ONE status row, not guaranteed exactly one. The FK requires
+every status to belong to a report; it cannot require every report to
+have a status. Status strings are not database-enumerated, and this
+table is not a status-transition history.</p>
+<h3 id="alembic_version-the-administrative-table">4.26.
+<code>alembic_version</code> — the administrative table</h3>
+<p>This is not an application model. Alembic creates it to record which
+migration revision has been applied. Its key column is
+<code>version_num</code>, normally containing <code>mysql_0003</code>
+for this guide’s schema. The project has a single migration chain, so
+one row is expected in normal operation.</p>
+<p>Why it exists: a developer needs to know whether a database contains
+just the original MySQL baseline or also the trigger repair and
+gate-linked messages. Checking that revision is more reliable than
+assuming two servers are identical because they both contain a table
+named users.</p>
+<p><code>alembic current</code> reads the recorded state.
+<code>alembic upgrade head</code> runs pending migrations. Manually
+writing a revision or using stamp does not execute the schema changes it
+claims to represent. Do not use stamping to conceal a failed
+migration.</p>
+<h2 id="how-the-tables-work-together">5. How the tables work
+together</h2>
+<h3 id="registering-a-login-and-joining-an-estate">5.1. Registering a
+login and joining an estate</h3>
+<ol type="1">
+<li>The application stages unverified signup data in pending_users and
+handles OTP verification.</li>
+<li>It establishes the users row according to the signup flow.</li>
+<li>It creates personal_info with the chosen estate, role, and correct
+access group.</li>
+<li>It creates account_holders linking the user and profile.</li>
+<li>The membership trigger rejects a second non-soft-deleted membership
+for the same user/estate.</li>
+<li>Application policy decides activation and authorization; insertion
+alone does not make is_active true.</li>
+</ol>
+<p>These are logical workflow steps, not a promise that a single
+endpoint performs all six. The API must group logically dependent writes
+in transactions and handle failures.</p>
+<h3 id="inviting-a-guest-and-registering-for-an-event">5.2. Inviting a
+guest and registering for an event</h3>
+<p>The host is an account holder. The guest’s own personal_info record
+describes the visitor. guests.creator_id points to the host membership,
+and guests.personal_info_id points to the visitor’s profile. The event
+also belongs to an account holder. event_registers links that guest to
+that event.</p>
+<p>An example with fictional IDs: host membership 81 invites guest 70 to
+event 15. The register stores (event_id=15, guest_id=70), not (15,
+user_id=20). If capacity is full, MySQL rejects the register insertion
+and the application should return an understandable response rather than
+a generic success.</p>
+<h3 id="determining-physical-gate-access">5.3. Determining physical gate
+access</h3>
+<p>A vehicle leads to personal_info. The profile leads to an estate and
+access group. A group/gate link and/or a direct profile/gate link
+supplies permitted gate relationships and time windows. The gate itself
+has opening hours and an active flag. The API also needs to consider
+authorization, profile expiry, membership deletion/activation, and any
+visit status rules applicable to the endpoint.</p>
+<p>The inspected gate API includes queries combining gate and link
+windows and handling midnight-crossing windows. These decisions happen
+in API SQL/code. No trigger opens a barrier or automatically evaluates
+every clock-based permission when time passes.</p>
+<h3 id="giving-permissions">5.4. Giving permissions</h3>
+<p>Role-based privileges follow personal_info → account_types →
+account_type_privilege_links → privileges. Individual grants follow
+personal_info → personal_info_privilege_links → privileges. The
+inspected authorization helper combines both grant paths for the user’s
+relevant estate membership.</p>
+<p>A permission row means the data is present for authorization to
+consult. It is the API’s job to authenticate the caller and enforce the
+permission. A database client with direct write privileges can bypass
+API permission checks; business triggers are not a substitute for
+endpoint authorization.</p>
+<h3 id="reporting-a-problem">5.5. Reporting a problem</h3>
+<p>The report identifies its user author and contents. report_status
+holds at most one current status. The application should insert both
+records in one transaction when opening a report, and update the status
+row thereafter. A status-history feature would need an additional
+history design; repeatedly inserting into report_status is deliberately
+rejected.</p>
+<h2 id="triggers-automatic-database-rules">6. Triggers: automatic
+database rules</h2>
+<p>A BEFORE trigger runs before MySQL finishes the requested row change
+and can reject it. An AFTER trigger runs after the row change but inside
+its transaction. A SIGNAL raises an error; it does not send an email,
+notification, or network request.</p>
+<p>The current definitions produce <strong>26 triggers</strong>: 20
+timestamp triggers, one default-group trigger, two membership triggers,
+one estate guard, and two capacity triggers.</p>
+<h3 id="the-20-_date_updated-triggers">6.1. The 20
+<code>*_date_updated</code> triggers</h3>
+<p>Each uses the same pattern:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">BEFORE</span> <span class="kw">UPDATE</span> <span class="kw">ON</span> the_table</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">FOR</span> <span class="kw">EACH</span> <span class="kw">ROW</span> <span class="kw">SET</span> <span class="kw">NEW</span>.date_updated <span class="op">=</span> UTC_TIMESTAMP(<span class="dv">6</span>)</span></code></pre></div>
+<p><code>NEW</code> is the proposed row value. Assigning
+NEW.date_updated in a BEFORE trigger is valid; it does not issue another
+UPDATE against the table. This is different from the self-table locking
+reads that caused error 1442.</p>
+<p>Why use a database trigger when SQLAlchemy also has onupdate
+settings? SQLAlchemy callbacks apply only when that layer constructs the
+write. The trigger also runs for raw SQL and other database clients.
+This keeps the timestamp behavior consistent across writing paths. An
+explicit historical date_updated value supplied in an ordinary UPDATE is
+overwritten by the trigger.</p>
+<p>The affected tables are:</p>
+<ul>
+<li><code>account_types</code> →
+<code>account_types_date_updated</code></li>
+<li><code>estates</code> → <code>estates_date_updated</code></li>
+<li><code>pending_users</code> →
+<code>pending_users_date_updated</code></li>
+<li><code>privileges</code> → <code>privileges_date_updated</code></li>
+<li><code>users</code> → <code>users_date_updated</code></li>
+<li><code>access_groups</code> →
+<code>access_groups_date_updated</code></li>
+<li><code>account_type_privilege_links</code> →
+<code>account_type_privilege_links_date_updated</code></li>
+<li><code>gates</code> → <code>gates_date_updated</code></li>
+<li><code>user_reports</code> →
+<code>user_reports_date_updated</code></li>
+<li><code>gate_access_group_links</code> →
+<code>gate_access_group_links_date_updated</code></li>
+<li><code>personal_info</code> →
+<code>personal_info_date_updated</code></li>
+<li><code>report_status</code> →
+<code>report_status_date_updated</code></li>
+<li><code>account_holders</code> →
+<code>account_holders_date_updated</code></li>
+<li><code>personal_info_gate_links</code> →
+<code>personal_info_gate_links_date_updated</code></li>
+<li><code>personal_info_privilege_links</code> →
+<code>personal_info_privilege_links_date_updated</code></li>
+<li><code>vehicles</code> → <code>vehicles_date_updated</code></li>
+<li><code>events</code> → <code>events_date_updated</code></li>
+<li><code>guests</code> → <code>guests_date_updated</code></li>
+<li><code>pending_account_holders</code> →
+<code>pending_account_holders_date_updated</code></li>
+<li><code>faces</code> → <code>faces_date_updated</code></li>
+</ul>
+<p>Tables such as accesslog, logs, messagedb, event_registers, and
+system_metrics have no date_updated column and no corresponding
+timestamp-update trigger.</p>
+<h3 id="estate_access_group">6.2. <code>estate_access_group</code></h3>
+<p><strong>When:</strong> AFTER INSERT on estates.
+<strong>Action:</strong> insert one access_groups row with the new
+estate ID and name REGULAR.</p>
+<p>Why: new estates need a predictable default group. Running this in
+the database means another insertion path cannot silently forget to
+create it. If creation of the group fails, the estate insert fails as
+part of the statement/transaction. Rolling back estate creation also
+rolls back the generated group.</p>
+<p>This does not set every new profile’s access_group_id correctly. That
+column’s numeric default of 1 is independent of the newly generated
+group ID. Application code must look up the estate’s group and use its
+actual ID.</p>
+<h3
+id="account_holder_estate_insert-and-account_holder_estate_update">6.3.
+<code>account_holder_estate_insert</code> and
+<code>account_holder_estate_update</code></h3>
+<p><strong>When:</strong> BEFORE INSERT or UPDATE on account_holders.
+<strong>Goal:</strong> at most one non-soft-deleted membership for the
+same user and estate.</p>
+<p>The trigger acts only when the proposed row has deleted_at IS NULL
+and personal_info_id IS NOT NULL. It then:</p>
+<ol type="1">
+<li>Rejects sessions whose configured isolation is not
+READ-COMMITTED.</li>
+<li>Reads and share-locks the personal-info record to find the
+estate.</li>
+<li>Locks the user row with FOR UPDATE, so competing membership
+creations for the same user must take turns.</li>
+<li>Counts matching non-soft-deleted memberships by joining
+account_holders to personal_info. This count is a normal nonlocking
+SELECT in the repaired version.</li>
+<li>On UPDATE, excludes the row currently being updated using ah.id
+&lt;&gt; OLD.id.</li>
+<li>Raises duplicate-key error <strong>1062</strong> when another
+matching membership exists.</li>
+</ol>
+<p>An ordinary address update therefore does not count the membership as
+its own duplicate. Soft-deleting a membership releases its user/estate
+combination for a new membership. Restoring it can fail if the
+combination has since been reused.</p>
+<p>Why not UNIQUE(user_id, personal_info_id)? Two different
+personal-info records may belong to the same estate, so that UNIQUE
+would allow duplicate user/estate memberships. A regular MySQL index on
+account_holders cannot obtain estate_id by joining personal_info. The
+trigger preserves the existing visible columns and enforces the
+relationship across tables. A redesigned schema with a directly stored
+estate key and suitable constraints is another possible approach, but
+was not chosen here.</p>
+<h3 id="personal_info_estate_guard">6.4.
+<code>personal_info_estate_guard</code></h3>
+<p><strong>When:</strong> BEFORE UPDATE on personal_info.
+<strong>Goal:</strong> prevent changing a membership’s estate indirectly
+through its profile.</p>
+<p>If estate_id changes and any account_holders row references that
+profile, the trigger raises SQLSTATE 45000 with a message instructing
+the caller to use a new personal-info record. The existence query uses
+FOR SHARE against account_holders; this is a different table from the
+one being updated.</p>
+<p>Why: changing a profile’s estate could otherwise bypass membership
+uniqueness or silently move the meaning of associated records. The guard
+checks all referencing memberships, including soft-deleted ones. It does
+not block changing a profile with only a guest reference. A proper
+estate move is an application workflow that must reconcile the old and
+new memberships and their dependents, not just edit one number.</p>
+<h3 id="event_capacity_insert-and-event_capacity_update">6.5.
+<code>event_capacity_insert</code> and
+<code>event_capacity_update</code></h3>
+<p><strong>When:</strong> BEFORE INSERT on event_registers, or BEFORE
+UPDATE when event_id changes.</p>
+<ol type="1">
+<li>Require a READ-COMMITTED session.</li>
+<li>Lock the destination events row using FOR UPDATE and read its
+capacity.</li>
+<li>Count current event_registers rows for that event with a normal
+SELECT.</li>
+<li>If the count is already at or above capacity, raise SQLSTATE 45000
+(MySQL error <strong>1644</strong>).</li>
+</ol>
+<p>Why the event-row lock matters: if one place remains, two clients
+must not both observe a spare place and insert. The parent lock makes
+the second client wait; under READ COMMITTED, its later count can
+observe the first client’s committed registration. A rollback by the
+first client leaves the place available.</p>
+<p>Updating an existing registration without changing event_id does not
+require another place. Moving it does require space in the destination.
+Deleting a registration frees capacity because the rule counts actual
+register rows; there is no separately maintained counter to
+decrement.</p>
+<p>This rule does not prevent lowering an event’s capacity below its
+existing registrations, and does not treat a guest status change as
+deleting a registration.</p>
+<h3 id="why-error-1442-happened-and-what-mysql_0002-changed">6.6. Why
+error 1442 happened and what <code>mysql_0002</code> changed</h3>
+<p>The original MySQL membership/count triggers used SELECT … FOR UPDATE
+against their own triggering tables. MySQL rejected the
+account_holders/event_registers operations with error
+<strong>1442</strong>, because those locking reads conflict with the
+table already used by the invoking write.</p>
+<p>The repair keeps locks on the stable parent rows (users and events)
+but removes locking clauses from the counts on the triggering tables. It
+adds the READ COMMITTED guard so sessions configured with a different
+isolation level are not silently assumed safe. The guard examines the
+session setting; all writers must also avoid per-transaction isolation
+overrides that contradict it.</p>
+<p>READ COMMITTED lets successive consistent reads observe newly
+committed changes. Under REPEATABLE READ, a previously established
+snapshot may remain old after waiting for a parent lock. Removing the
+count locks without considering isolation would therefore be an
+incomplete repair.</p>
+<p>Locks last until transaction completion, not merely until the trigger
+finishes. Keep write transactions short. Deadlocks are still possible
+when transactions lock several related rows in different orders; the
+application should handle transaction failures and use bounded retries
+where appropriate. These triggers are not a claim that all imaginable
+bulk-write or concurrency patterns have been proven safe.</p>
+<p>The repair is a new migration, not an edit to an already deployed
+baseline. MySQL trigger DDL auto-commits, so deployment needs a backup,
+paused writes, and checks afterward. Downgrading mysql_0002 restores the
+old faulty definitions; it is not a recommended production recovery
+procedure.</p>
+<h2 id="unique-null-and-soft-deletion">7. UNIQUE, NULL, and soft
+deletion</h2>
+<h3
+id="why-ordinary-unique-can-coexist-with-deletionbut-not-every-deletion-policy">7.1.
+Why ordinary UNIQUE can coexist with deletion—but not every deletion
+policy</h3>
+<p>A hard-deleted row no longer occupies its unique key. A soft-deleted
+row still exists, so ordinary UNIQUE(email) would continue reserving the
+email. The original PostgreSQL migration history used partial uniqueness
+for non-deleted rows. The MySQL design reproduces that policy with
+functional UNIQUE indexes.</p>
+<p>Conceptually, the indexed value is:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> <span class="cf">WHEN</span> deleted_at <span class="kw">IS</span> <span class="kw">NULL</span> <span class="cf">THEN</span> email <span class="cf">ELSE</span> <span class="kw">NULL</span> <span class="cf">END</span></span></code></pre></div>
+<p>The phone index works the same way. Live rows contribute their
+identifier. Soft-deleted rows contribute NULL, and MySQL permits
+multiple NULL values in a UNIQUE index. Thus the database still uses
+native UNIQUE enforcement, without extra visible helper columns on
+users.</p>
+<p>Example: a live user with alex@example.invalid blocks a second live
+user with that email. Mark the first user deleted, and a new live user
+can use it. Restoring the first user now fails until the conflict is
+resolved. An inactive but non-deleted user still occupies the
+identifier.</p>
+<h3 id="soft-delete-filtering-is-not-magic">7.2. Soft-delete filtering
+is not magic</h3>
+<p>Only users and account_holders have the soft-delete mixin here. The
+repository’s SQLAlchemy ORM hook adds filtering to applicable ORM
+SELECTs unless include_deleted is requested. It is not a database view
+or security rule. Raw SQL, Core connections, transfer scripts, and
+direct PyMySQL API queries must handle deleted_at explicitly. Do not
+assume every relationship-loading path or every table is automatically
+hidden.</p>
+<p>Marking a user soft-deleted does not automatically soft-delete all
+memberships or guests. Foreign-key cascades run on actual DELETE, not on
+setting deleted_at. Application authorization must handle these states
+consistently.</p>
+<h3 id="null-does-not-always-mean-broken-data">7.3. NULL does not always
+mean broken data</h3>
+<p>A NULL owner on a guest is permitted by the schema. A NULL actor on a
+log may mean a hard-deleted actor whose message was retained. A NULL
+deleted_at means not deleted. A NULL returned by a LEFT JOIN can mean
+that no matching row was found, even if the original source column had a
+non-NULL value.</p>
+<p>Interpret NULL using the column’s meaning and constraints, not a
+blanket assumption that every NULL should be replaced with an ID.</p>
+<h2 id="deletion-and-historical-records">8. Deletion and historical
+records</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Effect</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CASCADE</td>
+<td>Hard-deleting a parent also removes referencing child rows.</td>
+<td>Delete an event and its registrations disappear.</td>
+</tr>
+<tr>
+<td>SET NULL</td>
+<td>Keep the child, but remove the now-invalid reference.</td>
+<td>Delete a user and logs.actor_user_id becomes NULL.</td>
+</tr>
+<tr>
+<td>RESTRICT / NO ACTION</td>
+<td>Reject the parent deletion while references remain.</td>
+<td>A referenced role/group in personal_info cannot simply be
+removed.</td>
+</tr>
+<tr>
+<td>Soft delete</td>
+<td>UPDATE a marker; no FK delete action is triggered.</td>
+<td>Keep a former member’s record and relationships for history.</td>
+</tr>
+</tbody>
+</table>
+<p>Cascades can travel through several tables. Hard-deleting a user can
+remove memberships, their guests/events, and dependent registrations.
+The SET NULL policy on logs is deliberately different: retained audit
+text remains useful even when its referenced entities have gone.</p>
+<p>Do not assume “audit data never disappears.” accesslog and
+system_metrics cascade when gates are hard-deleted, while logs preserves
+records through its nullable references. A stricter archival requirement
+would need additional retention design.</p>
+<h2 id="storage-types-indexes-and-validation-boundaries">9. Storage
+types, indexes, and validation boundaries</h2>
+<h3 id="utc-timestamps-and-times-of-day">9.1. UTC timestamps and times
+of day</h3>
+<p>PostgreSQL timestamptz values were mapped to MySQL DATETIME(6), with
+UTC as the application/session convention. DATETIME itself does not
+retain an offset or timezone name. The repository’s UTCDateTime adapter
+converts aware Python datetimes to UTC before storage and attaches UTC
+when reading. Naive input must already mean UTC; the adapter cannot
+infer a missing timezone.</p>
+<p>The API’s direct database layer must follow the same convention.
+Timestamp triggers use UTC_TIMESTAMP(6), and connection initialization
+sets the session timezone to UTC. A gate’s opening_time/closing_time is
+TIME instead: a recurring time of day, not an absolute instant. The
+application must define the schedule timezone and handle overnight
+windows.</p>
+<h3 id="json-and-decimal-values">9.2. JSON and decimal values</h3>
+<p>MySQL JSON replaces PostgreSQL JSONB in guest details and metric
+payloads. JSON storage enforces syntactic JSON validity, but these
+models do not define a JSON schema for individual keys. Empty-object and
+empty-array defaults communicate expected shapes without guaranteeing
+that all clients submit those shapes.</p>
+<p>DECIMAL(6,3) means six total digits with three after the decimal
+point; DECIMAL(12,3) gives more integer capacity with the same
+fractional precision. Fixed precision is useful for deterministic
+storage and transfer comparisons. It does not make sensor data accurate
+or establish physical limits.</p>
+<h3 id="character-comparisons">9.3. Character comparisons</h3>
+<p>The models specify utf8mb4 and utf8mb4_0900_bin. utf8mb4 supports
+full Unicode, while this collation gives case-sensitive binary-style
+comparisons. Do not assume differently cased emails or plates compare
+equal. Normalize values consistently in application code when the
+business meaning is case-insensitive.</p>
+<h3 id="why-these-indexes-exist">9.4. Why these indexes exist</h3>
+<p>Foreign-key indexes and link-table primary keys support joins and
+parent/child lookups. A composite index such as (license_plate_number,
+timestamp) helps retrieve a vehicle’s access history; (estate_id,
+date_created) helps estate-specific audit timelines. Metric time indexes
+support time-window queries. A UNIQUE index both helps lookups and
+enforces a rule; an ordinary index such as vehicles.license_plate_number
+only helps lookups.</p>
+<p>Index order matters: the leading columns are especially useful for
+narrowing searches. More indexes are not automatically better, because
+inserts and updates must maintain them. Query plans and actual workload
+should guide new indexes.</p>
+<h3 id="what-mysql-enforces-versus-what-the-api-must-enforce">9.5. What
+MySQL enforces versus what the API must enforce</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Database-enforced here</th>
+<th>Still requires application policy or additional design</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Referenced rows exist, when FK values are non-NULL</td>
+<td>A referenced gate/group/profile belongs to the same estate</td>
+</tr>
+<tr>
+<td>One live identifier per functional unique key</td>
+<td>Email/phone/plate normalization and verification</td>
+</tr>
+<tr>
+<td>At most one current status row per report</td>
+<td>Every new report receives a status; valid transition rules</td>
+</tr>
+<tr>
+<td>One guest/event pair</td>
+<td>Whether that guest is permitted to join that event</td>
+</tr>
+<tr>
+<td>Membership uniqueness on the trigger’s covered path</td>
+<td>Profile-less memberships, activation, and caller authorization</td>
+</tr>
+<tr>
+<td>Capacity checks on register insert/move</td>
+<td>Capacity reductions, waiting lists, cancelled attendance policy</td>
+</tr>
+<tr>
+<td>Event end is later than start</td>
+<td>Positive capacity, permitted event duration, scheduling policy</td>
+</tr>
+<tr>
+<td>Valid JSON syntax</td>
+<td>Required JSON keys, units, bounds, and data shape</td>
+</tr>
+<tr>
+<td>date_updated changes on UPDATE</td>
+<td>Full audit history and external-service cleanup</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-the-postgresql-to-mysql-migration-was-done-this-way">10. Why
+the PostgreSQL-to-MySQL migration was done this way</h2>
+<h3 id="keep-the-source-database-separate">10.1. Keep the source
+database separate</h3>
+<p>The migration creates a separate MySQL database rather than changing
+PostgreSQL in place. This allows inspection and testing before switching
+the API. A copy of repository files is not a backup of database records,
+so source and destination database backups remain separate tasks.</p>
+<h3 id="preserve-ids-and-relationships">10.2. Preserve IDs and
+relationships</h3>
+<p>Rows are copied with their existing primary keys wherever the design
+allows. Reassigning every ID would require updating all foreign keys and
+any external references. Auto-increment values can have gaps after
+rollback, rejected inserts, or imported data; a gap does not by itself
+indicate missing business records.</p>
+<p>The notable semantic adjustment is guest ownership. The old FK
+pointed to users, while API paths used account-holder IDs. Some stored
+numbers therefore could not be safely interpreted from the FK alone.
+Preflight resolved user/estate memberships and required reviewed
+overrides for confirmed holder interpretations. A coincidentally
+matching number is not enough evidence of ownership.</p>
+<p>During this migration, a missing owner membership was explicitly
+created with user-approved details in PostgreSQL and then copied to
+MySQL. That was a deliberate source correction, separate from the
+transfer script itself, which reads the source without writing it. This
+guide does not embed the affected people’s identities or production
+IDs.</p>
+<h3 id="separate-baseline-and-later-repairs">10.3. Separate baseline and
+later repairs</h3>
+<p>mysql_0001 creates the MySQL tables and original triggers on an empty
+target. mysql_0002 repairs four triggers without changing application
+columns or deleting transferred rows. mysql_0003 adds the nullable
+message gate reference, index, and SET NULL foreign key while preserving
+legacy messages. Applied migrations should remain historical records;
+new fixes receive new revisions.</p>
+<p>The PostgreSQL migration archive is retained for reference but is not
+part of the active MySQL revision chain. Mixing both independent
+histories caused multiple Alembic heads earlier. Choosing upgrade heads
+would not make PostgreSQL-specific migrations valid on MySQL.</p>
+<h3 id="why-the-transfer-temporarily-disabled-triggers">10.4. Why the
+transfer temporarily disabled triggers</h3>
+<p>Copying an estate with its existing access groups must not create
+another REGULAR group automatically. Preserving timestamps and IDs also
+differs from normal user operations. The transfer therefore drops target
+triggers, copies in a transaction, verifies row counts and canonical
+content checksums, and restores the definitions afterward.</p>
+<p>This is why successful transfer was not proof that runtime triggers
+worked. The error 1442 issue required separate write tests with triggers
+enabled. Canonical checksum handling also needed date/time serialization
+so opening and closing times could be compared across driver
+representations.</p>
+<p>The transfer refuses a populated target rather than overwriting it.
+It uses a read-only repeatable-read source snapshot for consistency
+during copying. That read-only source isolation is separate from the
+READ COMMITTED requirement for MySQL business writes.</p>
+<h3 id="why-native-unique-was-retained-where-it-fits">10.5. Why native
+UNIQUE was retained where it fits</h3>
+<p>Native constraints provide a final defence when multiple clients
+write concurrently. Functional UNIQUE indexes satisfy soft-delete-aware
+user identifiers. UNIQUE(report_id) satisfies one current report status.
+Composite keys enforce link uniqueness. Membership uniqueness needs an
+estate obtained by joining another table, so its implementation uses a
+trigger and parent-row lock instead of a misleading UNIQUE on
+personal_info_id.</p>
+<h3 id="rollback-is-code-plus-data-compatibility">10.6. Rollback is code
+plus data compatibility</h3>
+<p>The old PostgreSQL-compatible API and its PostgreSQL URL can restore
+the old application path while PostgreSQL remains available. MySQL-only
+writes made after cutover are not automatically copied back. A
+production rollback after new writes requires pausing writers and
+reconciling data, not merely changing a URL.</p>
+<h2 id="ec2-lambda-and-certificates-in-plain-language">11. EC2, Lambda,
+and certificates in plain language</h2>
+<p>EC2 is the computer running Docker. The MySQL container is the
+database server. In this deployment, host port 3307 forwards to
+container port 3306 so another project’s MySQL on host port 3306 can
+remain separate.</p>
+<p>A binding of 127.0.0.1 permits local access only. A binding of
+0.0.0.0 listens on all IPv4 interfaces; clients use an actual reachable
+address, not 0.0.0.0. Publishing a port, allowing it through AWS
+security groups, and successfully authenticating to MySQL are separate
+requirements.</p>
+<p>TLS encrypts the connection and, when certificate/identity
+verification is enabled, lets the API verify the database server it
+reached. The server certificate must match the host/IP in the URL.
+require_secure_transport=ON rejects insecure TCP connections; it does
+not itself authenticate an application user or replace password
+checks.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Where it belongs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ca.pem / mysql-ca.pem</td>
+<td>Public trust certificate used to verify the server’s
+certificate</td>
+<td>Can be packaged with the Lambda layer</td>
+</tr>
+<tr>
+<td>server-cert.pem</td>
+<td>Public server certificate naming the endpoint</td>
+<td>MySQL server</td>
+</tr>
+<tr>
+<td>server-key.pem</td>
+<td>Private key proving the server’s identity</td>
+<td>MySQL server; not Lambda</td>
+</tr>
+<tr>
+<td>ca-key.pem</td>
+<td>Private signing key used to issue certificates</td>
+<td>Protected signing location; not Lambda</td>
+</tr>
+<tr>
+<td>EC2 SSH login key</td>
+<td>Authenticates an SSH/scp login to the host</td>
+<td>The authorized client machine; unrelated to the MySQL keys</td>
+</tr>
+</tbody>
+</table>
+<p>An API URL can have this shape, with placeholders rather than real
+credentials:</p>
+<pre class="text"><code>mysql://APP_USER:URL_ENCODED_PASSWORD@DB_HOST:3307/gate_access?ssl_ca=/opt/certs/mysql-ca.pem</code></pre>
+<p>The /opt/certs path refers to a file inside Lambda’s deployed layer.
+The same certificate needs a different local path when running
+migrations on EC2 or a developer’s Mac. A directory existing in the
+source tree is not proof that the layer build packaged it; the Makefile
+must copy it into the build artifact.</p>
+<p>The local repository’s Compose configuration and a manually edited
+EC2 Compose file can differ. Treat this section as an explanation of the
+deployment, not proof that every checkout has been synchronized. A
+successful direct MySQL connection does not prove a deployed Lambda has
+the right URL, layer, permissions, or network route.</p>
+<h2 id="read-only-sql-exercises">12. Read-only SQL exercises</h2>
+<p>These SELECT statements are examples for an already authorized
+database connection. They do not create, update, or delete application
+records. Limit returned data in production and avoid selecting
+password/OTP columns for routine inspection.</p>
+<h3 id="find-memberships-and-their-estate-context">Find memberships and
+their estate context</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> ah.<span class="kw">id</span> <span class="kw">AS</span> membership_id, ah.user_id,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       pi.name, e.name <span class="kw">AS</span> estate_name,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       ah.is_active, ah.deleted_at</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> account_holders ah</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> personal_info pi <span class="kw">ON</span> pi.<span class="kw">id</span> <span class="op">=</span> ah.personal_info_id</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> estates e <span class="kw">ON</span> e.<span class="kw">id</span> <span class="op">=</span> pi.estate_id</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ah.deleted_at <span class="kw">IS</span> <span class="kw">NULL</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> ah.<span class="kw">id</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div>
+<p>Question: why join personal_info rather than looking for
+account_holders.estate_id? Because estate_id is stored on the profile.
+An INNER JOIN also excludes profile-less memberships; use a LEFT JOIN
+when investigating incomplete links.</p>
+<h3 id="show-guests-and-their-hosts">Show guests and their hosts</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> g.<span class="kw">id</span> <span class="kw">AS</span> guest_id, gp.name <span class="kw">AS</span> guest_name,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       ah.<span class="kw">id</span> <span class="kw">AS</span> host_membership_id, hp.name <span class="kw">AS</span> host_name</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> guests g</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> personal_info gp <span class="kw">ON</span> gp.<span class="kw">id</span> <span class="op">=</span> g.personal_info_id</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> account_holders ah <span class="kw">ON</span> ah.<span class="kw">id</span> <span class="op">=</span> g.creator_id</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> personal_info hp <span class="kw">ON</span> hp.<span class="kw">id</span> <span class="op">=</span> ah.personal_info_id</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> g.<span class="kw">id</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div>
+<p>Question: why join personal_info twice with different aliases? The
+guest profile and host profile describe different people. NULL host
+values can be legitimate optional ownership, not necessarily a missing
+user login.</p>
+<h3 id="count-registrations-without-losing-empty-events">Count
+registrations without losing empty events</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> e.<span class="kw">id</span>, e.name, e.max_num_of_attendees,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">COUNT</span>(er.<span class="kw">id</span>) <span class="kw">AS</span> registered</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">events</span> e</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> event_registers er <span class="kw">ON</span> er.event_id <span class="op">=</span> e.<span class="kw">id</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> e.<span class="kw">id</span>, e.name, e.max_num_of_attendees</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> e.<span class="kw">id</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div>
+<p>Question: why COUNT(er.id), not COUNT(*)? For an event with no
+registrations, the LEFT JOIN still produces an event-side row. Counting
+the non-NULL register key gives zero correctly.</p>
+<h3 id="show-a-report-and-its-current-status">Show a report and its
+current status</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> r.<span class="kw">id</span>, r.subject, s.status</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> user_reports r</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> report_status s <span class="kw">ON</span> s.report_id <span class="op">=</span> r.<span class="kw">id</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> r.<span class="kw">id</span> <span class="kw">DESC</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div>
+<p>A NULL status here is possible because the schema allows a report
+with no status row. The UNIQUE FK prevents multiple statuses, not
+missing statuses.</p>
+<h3 id="inspect-revision-and-triggers">Inspect revision and
+triggers</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> version_num <span class="kw">FROM</span> alembic_version;</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> @@session.transaction_isolation;</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> TRIGGER_NAME, EVENT_MANIPULATION, EVENT_OBJECT_TABLE, ACTION_TIMING</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> information_schema.<span class="kw">TRIGGERS</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> TRIGGER_SCHEMA <span class="op">=</span> <span class="kw">DATABASE</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> TRIGGER_NAME;</span></code></pre></div>
+<p>These checks report what is actually installed, which may differ from
+a file on someone’s laptop.</p>
+<h2 id="validation-evidence-and-remaining-limits">13. Validation
+evidence and remaining limits</h2>
+<p>During the repair work, the original trigger definitions reproduced
+error 1442 on isolated MySQL 8.4.11. The repaired implementation passed
+20 repository tests, including seven MySQL integration tests covering
+membership behavior, concurrent membership creation, capacity
+competition, event movement, isolation rejection, and preservation of
+records across the trigger migration.</p>
+<p>A subsequent live EC2 test verified TLS, revision mysql_0002, and
+READ COMMITTED. In a rollback-only transaction it tested membership
+creation/update, duplicate rejection, soft deletion/restoration, guest
+registration, capacity rejection, moving a registration, and rejecting a
+move into a full event. All temporary records were rolled back and their
+absence verified. These tests could advance auto-increment counters, but
+did not change existing application records.</p>
+<p>The live test did not test every HTTP endpoint, Lambda deployment,
+external face service, alert workflow, overnight gate schedule, or every
+concurrency scenario. Successful data transfer, successful TLS, and
+successful API behavior are different pieces of evidence.</p>
+<h2 id="source-map-for-further-study">14. Source map for further
+study</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Source in this repository</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every table’s columns and constraints</td>
+<td><code>app/db/models/*.py</code></td>
+</tr>
+<tr>
+<td>Additional lookup indexes and storage settings</td>
+<td><code>app/db/models/indexes.py</code></td>
+</tr>
+<tr>
+<td>Current runtime trigger definitions</td>
+<td><code>scripts/schema_rules.py</code></td>
+</tr>
+<tr>
+<td>Original MySQL schema</td>
+<td><code>alembic/versions/mysql_0001_initial.py</code></td>
+</tr>
+<tr>
+<td>Error 1442 repair</td>
+<td><code>alembic/versions/mysql_0002_fix_trigger_locking.py</code></td>
+</tr>
+<tr>
+<td>Gate-specific message schema</td>
+<td><code>alembic/versions/mysql_0003_message_gate.py</code>,
+<code>docs/MESSAGE_GATE_MIGRATION.md</code></td>
+</tr>
+<tr>
+<td>Migration runner</td>
+<td><code>alembic/env.py</code></td>
+</tr>
+<tr>
+<td>Engine configuration and READ COMMITTED</td>
+<td><code>app/db/database.py</code></td>
+</tr>
+<tr>
+<td>UTC conversion</td>
+<td><code>app/db/types.py</code></td>
+</tr>
+<tr>
+<td>ORM soft-delete helper/filter</td>
+<td><code>app/db/soft_delete.py</code></td>
+</tr>
+<tr>
+<td>Empty-target data transfer and checksum comparison</td>
+<td><code>scripts/transfer_postgres.py</code></td>
+</tr>
+<tr>
+<td>Reviewed guest ownership resolution</td>
+<td><code>scripts/transfer_ownership.py</code></td>
+</tr>
+<tr>
+<td>Fresh-install seed, not for transferred databases</td>
+<td><code>scripts/seed.py</code></td>
+</tr>
+<tr>
+<td>Schema and integration checks</td>
+<td><code>tests/test_schema.py</code>,
+<code>tests/test_mysql.py</code></td>
+</tr>
+<tr>
+<td>Trigger deployment notes</td>
+<td><code>docs/TRIGGER_REPAIR.md</code></td>
+</tr>
+<tr>
+<td>Earlier migration decisions</td>
+<td><code>docs/MYSQL_MIGRATION.md</code>,
+<code>archive/postgresql/</code></td>
+</tr>
+</tbody>
+</table>
+<p>Selected API references checked in the sibling gate-access-pg
+project: shared/python/utils.py for privilege composition,
+lambdas/gate/handlers/gate.py for schedule-based gate queries,
+lambdas/account/handlers/subaccount.py for pending memberships,
+lambdas/face/handlers/pedestrian.py for external face IDs, and
+lambdas/user/handlers/user.py for report-status updates. These files
+live outside this database repository.</p>
+<h2 id="questions-to-check-your-understanding">15. Questions to check
+your understanding</h2>
+<ol type="1">
+<li>Why is guests.creator_id an account-holder ID rather than a user
+ID?</li>
+<li>Why does is_active=False not free a user’s email for reuse?</li>
+<li>Why does UNIQUE(user_id, personal_info_id) fail to enforce one
+membership per estate?</li>
+<li>Why does a successful transfer not prove that triggers work during
+normal writes?</li>
+<li>What does a parent-row lock contribute when only one event place
+remains?</li>
+<li>Why is report_status not a status-history table?</li>
+<li>Which records survive a hard-deleted actor through SET NULL, and
+which gate histories cascade?</li>
+<li>Why does Lambda need ca.pem but not ca-key.pem?</li>
+</ol>
+<p><strong>Answers:</strong> (1) A membership supplies estate context.
+(2) Functional uniqueness depends on deleted_at, not activation. (3)
+Different profiles can share an estate. (4) The transfer temporarily
+disables target triggers. (5) It serializes competing registrations;
+READ COMMITTED supplies a fresh committed view for the later count. (6)
+report_id is UNIQUE, so only one current row is allowed. (7) logs keeps
+its messages; accesslog and system_metrics cascade with gates. (8)
+Lambda verifies the issuer’s public certificate; it should not hold the
+signing authority’s private key.</p>
+</body>
+</html>
